@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+  <div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'catalog:product_list' %}">Products</a></li>
+        <li class="breadcrumb-item active">{{ product.name }}</li>
+      </ol>
+    </nav>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="row g-5">
+    <!-- Images -->
+    <div class="col-md-5">
+      {% with images=product.images.all %}
+        <div class="mb-3">
+          {% if images %}
+            <img id="mainProductImage" src="{{ images.0.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-3 w-100" style="height:350px;object-fit:cover;">
+          {% else %}
+            <div class="bg-light rounded-3" style="height:350px;"></div>
+          {% endif %}
+        </div>
+
+        {% if images|length > 1 %}
+          <div class="d-flex gap-2">
+            {% for img in images %}
+              <img src="{{ img.image.url }}" class="rounded-2 thumb-img" style="width:70px;height:70px;object-fit:cover;cursor:pointer;"
+                   onclick="document.getElementById('mainProductImage').src=this.src;">
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- Details -->
+    <div class="col-md-7">
+      <h3 class="fw-bold">{{ product.name }}</h3>
+      <p class="text-muted">{{ product.short_description }}</p>
+
+      <h3 class="text-primary fw-bold mb-2">
+        ₹{{ product.price }}
+        {% if product.stock_quantity > 0 %}
+          <span class="badge bg-success fs-6 ms-2">In Stock</span>
+        {% else %}
+          <span class="badge bg-danger fs-6 ms-2">Out of Stock</span>
+        {% endif %}
+      </h3>
+      <p class="text-muted small">SKU: {{ product.sku }}</p>
+
+    <form method="POST" action="{% url 'cart:add_to_cart' product.id %}" class="d-flex gap-2 my-3 align-items-center flex-wrap">
+        {% csrf_token %}
+        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}"
+         class="form-control qty-input" {% if product.stock_quantity == 0 %}disabled{% endif %}>
+
+      <button type="submit" name="action" value="add_to_cart" class="btn btn-primary rounded-pill px-4" {% if product.stock_quantity == 0 %}disabled{% endif %}>
+      <i class="bi bi-cart-plus me-1"></i> Add to Cart
+      </button>
+
+      <button type="submit" name="action" value="buy_now" class="btn btn-danger rounded-pill px-4" {% if product.stock_quantity == 0 %}disabled{% endif %}>
+      Buy Now
+      </button>
+    </form>
+
+      <hr>
+
+      <h6 class="fw-bold">Description</h6>
+      <div class="text-muted">{{ product.description|linebreaks }}</div>
+
+      {% if product.tags.all %}
+        <p class="mb-1">
+          <strong>Tags:</strong>
+          {% for tag in product.tags.all %}
+            <span class="badge bg-light text-dark border me-1">{{ tag.name }}</span>
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      <p class="mb-1"><strong>Category:</strong> {{ product.category.name|default:"—" }}</p>
+      <p class="mb-3"><strong>Brand:</strong> {{ product.brand.name|default:"—" }}</p>
+
+      <hr>
+
+      <!-- ===== Reviews Section ===== -->
+      <h6 class="fw-bold mb-3">
+        Reviews
+        {% if reviews %}
+          <span class="text-muted small fw-normal">({{ reviews|length }})</span>
+        {% endif %}
+      </h6>
+
+      {% if can_review %}
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">Write a Review</h6>
+            <form method="POST" action="{% url 'reviews:add_review' product.id %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                {{ review_form.rating }}
+                {% if review_form.rating.errors %}
+                  <div class="text-danger small mt-1">{{ review_form.rating.errors }}</div>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Comment</label>
+                {{ review_form.comment }}
+                {% if review_form.comment.errors %}
+                  <div class="text-danger small mt-1">{{ review_form.comment.errors }}</div>
+                {% endif %}
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">Submit Review</button>
+            </form>
+          </div>
+        </div>
+      {% elif already_reviewed %}
+        <p class="text-muted small mb-4"><i class="bi bi-check-circle me-1"></i>You've already reviewed this product.</p>
+      {% elif user.is_authenticated %}
+        <p class="text-muted small mb-4">Purchase this product to write a review.</p>
+      {% endif %}
+
+      {% if reviews %}
+        {% for review in reviews %}
+        <div class="d-flex gap-3 mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+          <div class="bg-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width:40px;height:40px;">
+            <i class="bi bi-person-fill text-secondary"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <strong class="small">{{ review.user.username }}</strong>
+              <span class="text-warning small">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= review.rating %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}
+                {% endfor %}
+              </span>
+            </div>
+            <p class="text-muted small mb-1">{{ review.comment }}</p>
+            <p class="text-muted small mb-0" style="font-size:0.75rem;">{{ review.created_at|date:"d M Y" }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted small">No reviews yet for this product.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

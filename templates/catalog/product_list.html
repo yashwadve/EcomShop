@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}All Products - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+<div class="container mt-3">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+      <li class="breadcrumb-item active">Products</li>
+    </ol>
+  </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <!-- Sidebar Filters -->
+  <div class="col-md-3 mb-4">
+    <div class="card border-0 shadow-sm p-3">
+      <h6 class="fw-bold mb-3">Categories</h6>
+      <ul class="list-unstyled mb-4">
+        <li class="mb-2">
+          <a href="{% url 'catalog:product_list' %}" class="text-decoration-none {% if not request.GET.category %}fw-bold text-primary{% else %}text-dark{% endif %}">All Categories</a>
+        </li>
+        {% for cat in categories %}
+        <li class="mb-2">
+          <a href="?category={{ cat.slug }}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}"
+             class="text-decoration-none {% if request.GET.category == cat.slug %}fw-bold text-primary{% else %}text-dark{% endif %}">
+            {{ cat.name }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <h6 class="fw-bold mb-3">Brands</h6>
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2">
+          <a href="{% url 'catalog:product_list' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}" class="text-decoration-none {% if not request.GET.brand %}fw-bold text-primary{% else %}text-dark{% endif %}">All Brands</a>
+        </li>
+        {% for brand in brands %}
+        <li class="mb-2">
+          <a href="?brand={{ brand.slug }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+             class="text-decoration-none {% if request.GET.brand == brand.slug %}fw-bold text-primary{% else %}text-dark{% endif %}">
+            {{ brand.name }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="col-md-9">
+    <h4 class="fw-bold mb-4">All Products</h4>
+
+    {% if page_obj %}
+    <div class="row g-4">
+      {% for product in page_obj %}
+      <div class="col-6 col-md-4 col-lg-4">
+        {% include 'catalog/product_card.html' %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Product pagination" class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}">Previous</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Previous</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}">{{ num }}</a>
+          </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}">Next</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Next</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+      <i class="bi bi-box-seam fs-1 text-muted d-block mb-3"></i>
+      <h5 class="text-muted">No products found</h5>
+      <p class="text-muted">Try adjusting or clearing your filters.</p>
+      <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-primary rounded-pill mt-2">Clear Filters</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

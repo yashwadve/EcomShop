@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Home - EcomShop{% endblock %}
+
+{% block content %}
+
+<!-- Featured Carousel -->
+{% if featured_products %}
+<div id="featuredCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+  <div class="carousel-inner rounded-3 overflow-hidden">
+    {% for product in featured_products %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      <div class="row align-items-center hero-slide p-4 p-md-5 rounded-3">
+        <div class="col-md-7">
+          <span class="badge bg-dark mb-2">{{ product.category.name|default:"Featured" }}</span>
+          <h2 class="fw-bold">{{ product.name }}</h2>
+          <p class="text-muted">{{ product.short_description|default:"" }}</p>
+          <h4 class="text-primary fw-bold">₹{{ product.price }}</h4>
+          <a href="{% url 'catalog:product_detail' product.slug %}" class="btn btn-outline-dark rounded-pill mt-2">View Details</a>
+        </div>
+        <div class="col-md-5 text-center">
+          {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-3 hero-img">
+          {% else %}
+            <div class="bg-secondary bg-opacity-25 rounded-3 hero-img-placeholder"></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% if featured_products|length > 1 %}
+  <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+  <div class="carousel-indicators position-relative mt-2">
+    {% for product in featured_products %}
+    <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="{% if forloop.first %}active{% endif %} bg-dark"></button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Latest Arrivals -->
+<div class="d-flex align-items-center mb-4">
+  <span class="border-start border-4 border-primary ps-2 fw-bold fs-5">Latest Arrivals</span>
+</div>
+
+<div class="row g-4">
+  {% for product in latest_products %}
+  <div class="col-6 col-md-4 col-lg-3">
+    {% include 'catalog/product_card.html' %}
+  </div>
+  {% empty %}
+  <p class="text-muted text-center py-5">No products available yet.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

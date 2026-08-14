@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}My Orders - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+  <div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+        <li class="breadcrumb-item active">My Orders</li>
+      </ol>
+    </nav>
+  </div>
+{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold mb-4">My Orders</h4>
+
+{% if page_obj %}
+  {% for order in page_obj %}
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="fw-bold mb-1">Order #{{ order.order_number }}</h6>
+          <p class="text-muted small mb-0">
+            <i class="bi bi-calendar3"></i> {{ order.created_at|date:"d M Y, h:i A" }}
+          </p>
+        </div>
+        <span class="badge status-{{ order.order_status }}">
+          {{ order.get_order_status_display }}
+        </span>
+      </div>
+
+      {% with first_item=order.items.first %}
+      <div class="d-flex align-items-center gap-3">
+        {% if first_item.thumbnail_url %}
+          <img src="{{ first_item.thumbnail_url }}" class="rounded-2 order-item-img">
+        {% else %}
+          <div class="bg-light rounded-2 order-item-img"></div>
+        {% endif %}
+        <div class="flex-grow-1">
+          <p class="mb-0 fw-bold small">{{ first_item.product_name }}</p>
+          {% if order.items.count > 1 %}
+            <p class="mb-0 text-muted small">+ {{ order.items.count|add:"-1" }} more item(s)</p>
+          {% endif %}
+        </div>
+        <div class="text-end">
+          <p class="text-muted small mb-1">Total Amount</p>
+          <p class="fw-bold mb-2">₹{{ order.total_amount }}</p>
+          <a href="{% url 'orders:order_detail' order.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+        </div>
+      </div>
+      {% endwith %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Pagination -->
+  {% if page_obj.paginator.num_pages > 1 %}
+  <nav aria-label="Orders pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+{% else %}
+  <div class="text-center text-muted py-5">
+    <i class="bi bi-bag-x fs-1"></i>
+    <p class="mt-2 mb-3">You haven't placed any orders yet.</p>
+    <a href="{% url 'catalog:product_list' %}" class="btn btn-primary rounded-pill px-4">Start Shopping</a>
+  </div>
+{% endif %}
+{% endblock %}

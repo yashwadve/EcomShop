@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Payment - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+  <div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'orders:my_orders' %}">My Orders</a></li>
+        <li class="breadcrumb-item active">Payment</li>
+      </ol>
+    </nav>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card border-0 shadow-sm p-4 text-center">
+      <i class="bi bi-shield-lock fs-1 text-primary mb-3"></i>
+      <h5 class="fw-bold">Complete Your Payment</h5>
+      <p class="text-muted small mb-4">Order #{{ order.order_number }}</p>
+
+      <div class="d-flex justify-content-between mb-2">
+        <span class="text-muted">Amount Payable</span>
+        <span class="fw-bold fs-5">₹{{ order.total_amount }}</span>
+      </div>
+
+      <hr>
+
+      <button id="rzp-pay-btn" class="btn btn-primary w-100 rounded-pill py-2">
+        <i class="bi bi-lock-fill me-1"></i> Pay ₹{{ order.total_amount }}
+      </button>
+
+      <a href="{% url 'orders:order_detail' order.id %}" class="text-muted small mt-3">
+        Cancel and view order
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById('rzp-pay-btn').addEventListener('click', function () {
+
+  const options = {
+    key: "{{ razorpay_key_id }}",
+    amount: "{{ amount_paise }}",
+    currency: "INR",
+    name: "EcomShop",
+    description: "Order #{{ order.order_number }}",
+    order_id: "{{ razorpay_order_id }}",
+    handler: function (response) {
+      fetch("{% url 'payments:verify_payment' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: new URLSearchParams({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.href = "{% url 'payments:payment_failed' order.id %}";
+        }
+      })
+      .catch(() => {
+        window.location.href = "{% url 'payments:payment_failed' order.id %}";
+      });
+    },
+    prefill: {
+      name: "{{ order.shipping_full_name }}",
+      contact: "{{ order.shipping_phone }}"
+    },
+    theme: {
+      color: "#6f42c1"
+    },
+    modal: {
+      ondismiss: function () {
+        window.location.href = "{% url 'payments:payment_failed' order.id %}";
+      }
+    }
+  };
+
+  const rzp = new Razorpay(options);
+
+  rzp.on('payment.failed', function (response) {
+    window.location.href = "{% url 'payments:payment_failed' order.id %}";
+  });
+
+  rzp.open();
+});
+</script>
+{% endblock %}

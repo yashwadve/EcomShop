@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Search Results - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+<div class="container mt-3">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+      <li class="breadcrumb-item active">Search Results</li>
+    </ol>
+  </nav>
+</div>
+{% endblock %}
+
+{% block content %}
+<h4 class="fw-bold">Search Results for "{{ query }}"</h4>
+{% if query %}
+<p class="text-muted">Found {{ result_count }} product{{ result_count|pluralize }}</p>
+{% endif %}
+
+{% if page_obj %}
+<div class="row g-4 mt-2">
+  {% for product in page_obj %}
+  <div class="col-6 col-md-4 col-lg-3">
+    {% include 'catalog/product_card.html' %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.paginator.num_pages > 1 %}
+<nav aria-label="Search pagination" class="mt-5">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}">Previous</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+        <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+      </li>
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="text-center text-muted py-5">
+  <i class="bi bi-search fs-1"></i>
+  <p class="mt-2">
+    {% if query %}No products matched "{{ query }}".{% else %}Enter a keyword to search.{% endif %}
+  </p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+<div class="mb-2"><label class="form-label">Full Name</label>{{ form.full_name }}</div>
+<div class="mb-2"><label class="form-label">Phone</label>{{ form.phone }}</div>
+<div class="mb-2"><label class="form-label">Address Line 1</label>{{ form.address_line1 }}</div>
+<div class="mb-2"><label class="form-label">Address Line 2</label>{{ form.address_line2 }}</div>
+<div class="row">
+  <div class="col-md-6 mb-2"><label class="form-label">City</label>{{ form.city }}</div>
+  <div class="col-md-6 mb-2"><label class="form-label">State</label>{{ form.state }}</div>
+</div>
+<div class="mb-2"><label class="form-label">Pincode</label>{{ form.pincode }}</div>
+<div class="form-check mt-2">
+  {{ form.is_default }}
+  <label class="form-check-label">Set as default address</label>
+</div>

@@ -1,0 +1,293 @@
+/* ========== COLOR SCHEME (CSS Variables) ========== */
+:root {
+  --brand-primary: #6f42c1;
+  --brand-primary-hover: #5a349e;
+  --brand-accent: #fd7e14;       
+  --text-dark: #2b2b33;
+  --bg-light: #f8f9fb;
+}
+
+/* ========== GLOBAL ========== */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: var(--text-dark);
+}
+
+main {
+  flex: 1;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* ========== NAVBAR ========== */
+.navbar-brand {
+  letter-spacing: -0.5px;
+  color: var(--brand-primary) !important;
+}
+
+.search-form {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+}
+
+.search-input {
+  border-radius: 20px 0 0 20px;
+  border-right: none;
+}
+
+.search-input:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+.search-btn {
+  border-radius: 0 20px 20px 0;
+  border: 1px solid #ced4da;
+  border-left: none;
+  background-color: #fff;
+  color: #6c757d;
+}
+
+.search-btn:hover {
+  background-color: #f1f1f1;
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0;
+  right: -6px;
+  font-size: 0.65rem;
+  background-color: var(--brand-accent) !important;
+}
+
+.avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: var(--brand-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-btn {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.login-btn:hover {
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
+}
+
+/* ========== BOOTSTRAP OVERRIDES (so btn-primary/text-primary use OUR brand color) ========== */
+.btn-primary {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--brand-primary-hover) !important;
+  border-color: var(--brand-primary-hover) !important;
+}
+
+.text-primary {
+  color: var(--brand-primary) !important;
+}
+
+.btn-outline-primary {
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+/* ========== FOOTER ========== */
+.footer-link {
+  color: #adb5bd;
+  transition: color 0.2s ease-in-out;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+}
+
+/* ========== CARDS (product cards, used later in catalog templates) ========== */
+.product-card {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  transition: box-shadow 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.badge-featured {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background-color: var(--brand-accent) !important;
+}
+
+/* ========== ORDER STATUS BADGES (used later in orders templates) ========== */
+.status-pending   { background-color: #ffc107 !important; color: #212529 !important; }
+.status-paid,
+.status-delivered { background-color: #198754 !important; }
+.status-shipped   { background-color: #0d6efd !important; }
+.status-failed,
+.status-cancelled { background-color: #dc3545 !important; }
+
+/* ========== HOME PAGE ========== */
+.hero-slide {
+  background-color: #fdf6e3; /* warm neutral tone for the spotlight banner */
+}
+
+.hero-img {
+  max-height: 250px;
+}
+
+.hero-img-placeholder {
+  height: 250px;
+}
+
+.product-card-img {
+  height: 180px;
+  object-fit: cover;
+}
+
+.qty-input {
+  width: 80px;
+}
+
+/* ========== CART PAGE ========== */
+.cart-item-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.cart-qty-group {
+  width: 120px;
+}
+
+.cart-summary-sticky {
+  top: 90px; 
+}
+
+/* ========== CHECKOUT PAGE ========== */
+.checkout-item-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.address-card {
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.address-card.selected {
+  border-color: var(--brand-primary) !important;
+  background-color: #f8f5ff;
+}
+
+.address-label {
+  cursor: pointer;
+}
+
+/* ========== ORDER PAGE ========== */
+.order-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+.status-created {
+  background-color: #6c757d !important; 
+}
+
+/* ========== ORDER DETAIL PAGE ========== */
+.order-detail-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* Vertical tracking timeline */
+.tracking-timeline {
+  position: relative;
+  padding-left: 0;
+}
+
+.tracking-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.tracking-step:not(.last)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: #e0e0e0;
+}
+
+.tracking-step.done:not(.last)::before {
+  background-color: #198754;
+}
+
+.tracking-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #adb5bd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  z-index: 1;
+}
+
+.tracking-step.done .tracking-icon {
+  background-color: #198754;
+  color: #fff;
+}
+
+.tracking-step.failed .tracking-icon {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* ========== PROFILE / ADDRESSES PAGES ========== */
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Order {{ order.order_number }} - EcomShop{% endblock %}
+
+{% block breadcrumb %}
+  <div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'catalog:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'orders:my_orders' %}">My Orders</a></li>
+        <li class="breadcrumb-item active">Order Details</li>
+      </ol>
+    </nav>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <h5 class="fw-bold mb-1">{{ order.order_number }}</h5>
+    <p class="text-muted small mb-0">
+      <i class="bi bi-calendar3"></i> Placed on {{ order.created_at|date:"d M Y, h:i A" }}
+    </p>
+  </div>
+  <span class="badge status-{{ order.order_status }} fs-6">
+    {{ order.get_order_status_display }}
+  </span>
+</div>
+
+<div class="row g-4">
+  <!-- Items + Tracking -->
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-box-seam me-2"></i>Items Ordered</div>
+      <div class="card-body">
+        {% for item in order.items.all %}
+        <div class="d-flex align-items-center gap-3 {% if not forloop.last %}mb-3 pb-3 border-bottom{% endif %}">
+          {% if item.thumbnail_url %}
+            <img src="{{ item.thumbnail_url }}" class="rounded-2 order-detail-img">
+          {% else %}
+            <div class="bg-light rounded-2 order-detail-img"></div>
+          {% endif %}
+          <div class="flex-grow-1">
+            <p class="mb-0 fw-bold small">{{ item.product_name }}</p>
+            <p class="mb-0 text-muted small">Qty: {{ item.quantity }} × ₹{{ item.unit_price }}</p>
+          </div>
+          <p class="mb-0 fw-bold">₹{{ item.subtotal }}</p>
+        </div>
+        {% endfor %}
+
+        <hr>
+        <div class="d-flex justify-content-between fw-bold fs-5">
+          <span>Order Total</span>
+          <span>₹{{ order.total_amount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Tracking -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-truck me-2"></i>Order Tracking</div>
+      <div class="card-body">
+        <ul class="list-unstyled mb-0 tracking-timeline">
+
+          <li class="tracking-step {% if order.order_status != 'cancelled' %}done{% endif %}">
+            <span class="tracking-icon"><i class="bi bi-bag-check-fill"></i></span>
+            <div>
+              <p class="mb-0 fw-bold small">Order Placed</p>
+              <p class="mb-0 text-muted small">{{ order.created_at|date:"d M, h:i A" }}</p>
+            </div>
+          </li>
+
+          <li class="tracking-step {% if order.payment_status == 'paid' %}done{% elif order.payment_status == 'failed' %}failed{% endif %}">
+            <span class="tracking-icon"><i class="bi bi-credit-card-fill"></i></span>
+            <div>
+              <p class="mb-0 fw-bold small">Payment {{ order.get_payment_status_display }}</p>
+            </div>
+          </li>
+
+          <li class="tracking-step {% if order.order_status == 'shipped' or order.order_status == 'delivered' %}done{% endif %}">
+            <span class="tracking-icon"><i class="bi bi-box-seam-fill"></i></span>
+            <div>
+              <p class="mb-0 fw-bold small">Shipped</p>
+            </div>
+          </li>
+
+          <li class="tracking-step {% if order.order_status == 'delivered' %}done{% endif %} last">
+            <span class="tracking-icon"><i class="bi bi-check-circle-fill"></i></span>
+            <div>
+              <p class="mb-0 fw-bold small">Delivered</p>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shipping Address -->
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-geo-alt me-2"></i>Shipping Address</div>
+      <div class="card-body">
+        <p class="fw-bold mb-1">{{ order.shipping_full_name }}</p>
+        <p class="text-muted small mb-1">{{ order.shipping_phone }}</p>
+        <p class="text-muted small mb-0">
+          {{ order.shipping_address_line1 }}{% if order.shipping_address_line2 %}, {{ order.shipping_address_line2 }}{% endif %},<br>
+          {{ order.shipping_city }}, {{ order.shipping_state }} - {{ order.shipping_pincode }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
